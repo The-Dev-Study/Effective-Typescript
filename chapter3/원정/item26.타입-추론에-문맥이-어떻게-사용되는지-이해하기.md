@@ -17,7 +17,7 @@ setLanguage(language);
 
 이런 문제를 해결하는 두 가지 방법이 있다.
 
-### 타입 선언에서 languae의 가능한 값을 제한하기
+### 타입 선언에서 language의 가능한 값을 제한하기
 ``` typescript
 let language: Language = 'JavaScript';
 setLanguage(language); // 정상
@@ -88,10 +88,10 @@ const ts = {
     organization: 'Microsoft'
 };
 
-complain(ts);
+complain(ts); // 오류!
 ```
 
-ts 객체에서 language의 타입은 string 으로 추론된다. 이 문제느느 타입 선언을 추가하거나 상수 단언을 사용해 해결한다.
+ts 객체에서 language의 타입은 string 으로 추론된다. 이 문제는 타입 선언을 추가하거나 상수 단언을 사용해 해결한다.
 
 ## 콜백 사용 시 주의점
 콜백을 다른 함수로 전달할 때, 타입스크립트는 콜백의 매개변수 타입을 추론하기 위해 문맥을 사용한다.
