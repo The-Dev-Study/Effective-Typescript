@@ -6,9 +6,9 @@ interface State {
     error?: string;
 }
 
-fuction renderPage(state: State) {
+function renderPage(state: State) {
     if (state.error) {
-        reutrn `Error! Unable to load ${currentPage}: ${state.error}`;
+        return `Error! Unable to load ${currentPage}: ${state.error}`;
     } else if (state.isLoading) {
         return `Loading ${currentPage}...`;
     }
