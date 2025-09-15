@@ -1,0 +1,54 @@
+# 아이템 43. 몽키 패치보다는 안전한 타입을 사용하기 ⭐⭐⭐
+
+> **몽키 패치: 런타임 코드를 동적으로 수정하는 행위**
+
+자바스크립트를 사용하면 객체와 클래스에 임의의 속성을 추가할 수 있다.
+
+```ts
+window.monkey = 'Tamarin';
+document.monkey = 'Howler';
+```
+
+-   `window`와 `document`에 값을 할당하여 전역 변수를 만들 수 있다.
+
+```ts
+const el = document.getElementById('colobus');
+el.home = 'tree';
+```
+
+-   DOM 엘리먼트에 데이터를 추가할 수 있다.
+
+타입스크립트와 같이 사용하는 경우, 타입체커는 Document와 HTMLElement의 내장속성은 알고 있지만, 임의로 추가한 속성에 대해서는 알지 못한다.
+
+이를 해결하기 위해서 `any`를 사용할 수 있지만, 타입 안전성을 상실하고 언어 서비스를 사용할 수 없게 된다는 단점을 가지고 있다.
+
+이를 해결하기 위한 방법은 총 세 가지가 있다.
+
+> 1. document 또는 DOM으로부터 데이터 분리하기 (최선)
+> 2. interface의 특수 기능인 **보강**사용하기
+> 3. 더 구체적인 타입 단언문 사용하기
+
+## interface 보강 사용하기
+
+```ts
+interface Document {
+    monkey: string;
+}
+
+document.monkey = 'Tamarin';
+```
+
+-   보강이 `any`보다 안전한 타입이다.
+-   속성에 주석을 붙일 수 있다.
+-   속성에 자동완성을 사용할 수 있다.
+-   몽키 패치가 적용된 부분에 대한 기록이 남는다.
+
+## 타입 단언문 사용하기
+
+```ts
+interface MonkeyDocument extends Document {
+    monkey: string;
+}
+(document as MonkeyDocument).monkey = 'Macaque';
+S;
+```

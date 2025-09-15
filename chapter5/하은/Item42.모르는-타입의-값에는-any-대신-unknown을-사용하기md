@@ -1,0 +1,110 @@
+# 아이템 42. 모르는 타입의 값에는 any 대신 unknown을 사용하기
+
+> `unknown`은 `any` 대신 쓸 수 있는 타입 시스템에 부합하는 값이다.
+
+## `unknown`의 특징
+
+-   어떠한 타입이든 `unknown`에 할당이 가능하다.
+-   `unknown`과 `any` 타입에만 할당할 수 있다.
+-   `unknown`인 채로 값을 사용하려고 하면 오류가 발생한다. 따라서 적절한 타입으로 변환하도록 강제한다.
+
+## 반환값 `unknown`
+
+YAML 문자열을 파싱하여 JavaScript 객체로 변환하는 데 사용되는 `parseYAML` 함수를 만들어보자.
+
+`parseYAML`을 호출한 곳에서 반환값을 원하는 타입으로 할당하는 것이 이상적이다.
+
+```ts
+function safeParseYAML(yaml: string): unknown {
+    return parseYAML(yaml);
+}
+
+const book = safeParseYAML(`
+    name: The Tenant of Wildfell Hall
+    author: Anne Bronte
+`) as Book;
+```
+
+-   `safeParseYAML`이 `unknown`타입의 값을 반환하기 때문에, 호출 할 때에는 반드시 타입 단언을 해야한다.
+
+## 변수 `unknown`
+
+`properties`의 타입은 예상할 수 없기 때문에 `unknown`으로 선언한 코드이다.
+
+```ts
+interface Feature {
+    id?: string | number;
+    geometry: Geometry;
+    properties: unknown;
+}
+```
+
+타입 단언문 뿐 아니라 `instanceof`를 통해서도 원하는 타입으로 변환할 수 있다.
+
+```ts
+function processValue(val: unknown) {
+    if (val instanceof Date) {
+        val; // 타입이 Date
+    }
+}
+```
+
+또한 사용자 정의 타입 가드를 사용해서 변환할 수도 있다.
+
+```ts
+function isBook(val: unknown): val is Book {
+    return typeof val === 'object' && val !== null && 'name' in val && 'author' in val;
+}
+
+function processValue(val: unknown) {
+    if (isBook(val)) {
+        val; // 타입이 Book
+    }
+}
+```
+
+## 단언문 `unknown` ⭐⭐
+
+이중 단언문에서 `any` 대신 `unknown`을 사용할 수 있다.
+
+```ts
+declare const foo: Foo;
+let barAny = foo as any as Bar;
+let barUnk = foo as unknown as Bar;
+```
+
+-   두 개의 단언문을 분리하는 리팩토링을 하는 경우 `unknown`이 더 안전하다.
+
+## `object`와 `{}`
+
+`object`와 `{}`은 범위가 넓은 타입이지만 `unknown`보다 범위가 약간 좁다. `unknown`에는 모든 값을 저장할 수 있지만, `object`와 `{}`는 특정 값들만 허용한다.
+
+### `{}`
+
+`{}`타입은 **null과 undefined**를 제외한 모든 값을 허용한다.
+
+```ts
+let emptyObject: {} = 42; // ✅
+let emptyObject2: {} = 'hello'; // ✅
+let emptyObject3: {} = true; // ✅
+let emptyObject4: {} = []; // ✅
+let emptyObject5: {} = {}; // ✅
+
+// 에러
+let emptyObject6: {} = null; // ❌
+let emptyObject7: {} = undefined; // ❌
+```
+
+### `object`
+
+object 타입은 `비원시(non-primitive)`타입만 허용한다.
+
+```ts
+let obj: object = {}; // ✅
+let obj2: object = []; // ✅
+let obj3: object = function () {}; // ✅
+
+let obj4: object = 42; // ❌
+let obj5: object = 'hello'; // ❌
+let obj6: object = true; // ❌
+```
